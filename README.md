@@ -18,10 +18,6 @@
 
     ./build_dmg
 
-### Install Release
-
-    rsync -av --delete bin/KeePassX.app/ /Applications/KeePassX.app
-
 ## Return codebase to pristine
 
     make distclean && git clean -dff && git clean -Xff
