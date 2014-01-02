@@ -11,7 +11,12 @@
 
 ### Build for Releasing
 
+    
     qmake ARCH=x86 LINK=STATIC -config release && make
+
+### Build Release
+
+    ./build_dmg
 
 ### Install Release
 

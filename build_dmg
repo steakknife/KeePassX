@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+set -x
+
+VOLNAME="KeePassX"
+DMG="KeePassX.dmg"
+SRC_DIR="bin"
+ICON_FILE="./share/macx_bundle/icon.icns"
+APP="KeePassX.app"
+BINARY="$APP/Contents/MacOS/KeePassX"
+APP_BINARY="$SRC_DIR/$BINARY"
+CODESIGN_IDENTITY=''
+
+if [ ! -d "$APP_BINARY" ]; then
+  qmake ARCH=x86 LINK=STATIC -config release && make
+fi
+( cd "$SRC_DIR" && test ! -h Applications && ln -s /Applications )
+rm -f "$DMG"
+TMP_DMG="$(mktemp -u -t XXXXXXX)"
+trap 'RESULT=$?; rm -f "$TMP_DMG"; exit $RESULT' INT QUIT TERM EXIT
+hdiutil create -srcfolder "$SRC_DIR" -volname "$VOLNAME" -scrub -fs HFS+ -fsargs '-c c=64,a=16,e=16' -format UDRW "$TMP_DMG"
+TMP_DMG="$TMP_DMG.dmg"
+DEVICE="$(hdiutil attach -readwrite -noautoopen "$TMP_DMG" | awk 'NR==1{print$1}')"
+VOLUME="$(mount | grep /dev/disk5 | sed 's/^[^ ]* on //;s/ ([^)]*)$//')"
+cp ./share/macx_bundle/icon.icns "$VOLUME/.VolumeIcon.icns"
+SetFile -c icnC "$VOLUME/.VolumeIcon.icns"
+SetFile -a C "$VOLUME"
+if [ -n "$CODESIGN_IDENTITY" ]; then
+  codesign -s "$CODESIGN_IDENTITY" -v "$VOLUME/$APP"
+fi
+hdiutil detach "$DEVICE"
+hdiutil convert "$TMP_DMG" -format UDZO -imagekey zlib-level=9 -o "$DMG"
+if [ -n "$CODESIGN_IDENTITY" ]; then
+  codesign -s "$CODESIGN_IDENTITY" -v "$DMG"
+fi
