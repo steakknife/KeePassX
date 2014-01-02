@@ -9,10 +9,12 @@
 
     qmake ARCH=x86 LINK=STATIC && make
 
-### Build for Release 
+### Build for Releasing
 
     qmake ARCH=x86 LINK=STATIC -config release && make
 
-    # install with:  `cp -ai bin/KeePassX.app /Applications`
+### Install Release
+
+    rsync -av --delete bin/KeePassX.app/ /Applications/KeePassX.app
 
 
