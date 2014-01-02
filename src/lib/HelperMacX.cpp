@@ -109,7 +109,7 @@ OSType HelperMacX::getProcessSignature(pid_t pid){
 	ProcessSerialNumber processSerialNumber;
 	ProcessInfoRec processInfoRec;
 	processInfoRec.processInfoLength = sizeof(processInfoRec);
-	processInfoRec.processAppSpec = NULL;
+//	processInfoRec.processAppSpec = NULL;
 	processInfoRec.processName = NULL;
 	err = GetProcessForPID(pid, &processSerialNumber);
 	if (noErr != err) {
